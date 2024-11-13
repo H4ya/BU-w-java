@@ -1,0 +1,611 @@
+//! return here later
+// OPTIMIZE 
+// TODO
+// UGLY
+// fixME
+//? Hey
+// *@param
+//meeh
+
+import java.util.Random;
+import java.util.Scanner;
+
+public class BookingSystem {
+    public static int choice;
+
+    static String main_menu = "\n*** Welcome to Booking System ***\n" +
+            "1- [ Admin ] \n" +
+            "2- [ Guest ]\n" +
+            "3- [ Exit  ]\n" +
+            "Your Choice: ";
+
+    static String admin_menu = "\n\t*** Welcome to Admin system ***\n" +
+        "\t1- [ Show statistics  ]\n" +
+        "\t2- [ View bookings    ]\n" +
+        "\t3- [ Delete a booking ]\n" +
+        "\t4- [ Edit a booking   ]\n" +
+        "\t5- [ Display guest information ]\n" +
+        "\t6- [ Exit ]\n" +
+        "\tYour Choice: ";
+
+    static String guest_menu = "\n\t*** Welcome to Guest system ***\n" +
+            "\t1- [ Add booking  ]\n" +
+            "\t2- [ View booking ]\n" +
+            "\t2- [ Exit ]\n" +
+            "\tYour Choice: ";
+    static Admin adminObj = new Admin("admin","Manea2024@gmail.com","Manea","0551231234", "admin123"); 
+    public static Scanner input = new Scanner(System.in);
+    static Admin admin = new Admin();
+    static Guest guest;
+
+    public static void main(String[] args) {
+        while (true) {
+            System.out.print(main_menu);
+            choice = input.nextInt();
+
+            switch (choice) {
+                case 1:
+                    if (admin.checkUser()) { 
+                        System.out.println("");
+                        admin_System();
+                    } else {
+                        System.out.println("Access Denied.");}
+                    break;
+                case 2:
+                    guest_System();
+                    break;
+                case 3:
+                    System.out.println("Thank you for using our system <3");
+                    break;
+                
+                default:
+                    System.out.println("Wrong Entry. Please enter a valid option.");
+            }
+        }
+    }
+
+    static void admin_System() {
+        while (true) {
+            System.out.print(admin_menu);
+            choice = input.nextInt();
+
+            switch (choice) {
+                case 1:
+                    admin.showStatistics();
+                    break;
+                case 2:
+                    admin.viewBookings();
+                    break;
+                case 3:
+                    System.out.print("Enter the booking ID to delete: ");
+                    String bookingID = input.next();
+                    admin.delBooking(bookingID);
+                    break;
+                case 4:
+                    System.out.print("Enter the booking ID to edit it: ");
+                    String bookingID2 = input.next();
+                    admin.editBooking(bookingID2);
+                    break;
+                case 5:
+                    System.out.println("Display guest information");
+                    break;
+                case 6:
+                    System.out.println("Exiting Admin system...");
+                    break;
+                default:
+                    System.out.println("Wrong Entry. Please enter a valid option.");
+            }
+        }
+    }
+
+    static void guest_System() {
+        int choice = 0;
+
+        while (choice != 2) {
+            System.out.print(guest_menu);
+            choice = input.nextInt();
+
+            switch (choice) {
+                case 1:
+                    input.nextLine();
+                    System.out.print("\tEnter guest name: ");
+                    String name = input.nextLine();
+                    System.out.print("\tEnter guest phone number: ");
+                    String phoneNumber = input.nextLine();
+                    System.out.print("\tEnter guest password: ");
+                    String password = input.nextLine();
+                    System.out.print("\tEnter guest age: ");
+                    int age = input.nextInt();
+                    System.out.print("\tDo you have family ? yes or no: ");
+                    boolean familyStatus = input.nextBoolean();
+                    guest = new Guest(name, phoneNumber, password, age, familyStatus);
+                    admin.addGuest(guest);
+                    System.out.println("Guest added successfully.");
+                    break;
+                case 2:
+                    if (guest != null) {
+                        System.out.print("\tEnter booking ID: ");
+                        String bookingID = input.next();
+                        guest.viewBooking(bookingID);
+                    } else {
+                        System.out.println("\tNo guest found. Please add a booking first.");
+                    }
+                    break;
+                case 3:
+                    System.out.println("Exiting Guest system...");
+                    break;
+                default:
+                    System.out.println("Wrong Entry. Please enter a valid option.");
+            }
+        }
+    }
+}
+
+class User {
+    public String name;
+    private String phoneNumber;
+    private String password;
+
+    // default Constructor
+    public User() {
+    }
+
+    // parametrized Constructor
+    public User(String name, String phoneNumber, String password) {
+        this.name = name; //optimize ? maybe? ig
+        setPhoneNo(phoneNumber);
+        setPassword(password);
+    }
+    
+    //! I added Scanner as parameter is it ok?
+    // Method to check if the user is allowed to enter
+    public boolean checkUser(Scanner myInput, String name, String password, String phone) {
+        System.out.println("Enter Username: ");
+        String username = myInput.nextLine();
+        System.out.println("Enter Password: ");
+        String userPassword = myInput.nextLine();
+        System.out.println("Enter Phone Number: ");
+        String userPhone = myInput.nextLine();//ugly!!!
+            if (!username.equals(name)) {
+                System.out.println("Error: Incorrect name.");
+                return false;
+            } else if (!userPassword.equals(password)) {
+                System.out.println("Error: Incorrect password.");
+                return false;
+            } else {
+                System.out.println("Login successful.");
+                return true;
+            }
+        }
+
+    // Getter for password
+    public String getPassword() {
+        return password;
+    }
+
+    // Setter for password
+    public void setPassword(String password) {
+        if (password.matches(".*[@-].*")) {
+            System.out.println("Valid password");
+            this.password = password;
+        } 
+        else {
+            System.out.println("Invalid password: must contain at least one special character '@' or '-'.");
+        }
+    }
+
+
+    // Getter for phone number
+    public String getPhoneNo() {
+        return phoneNumber;
+    }
+
+    // Setter for phone number with validation for 10 digits
+    public void setPhoneNo(String phoneNumber) {
+        if (phoneNumber != null && phoneNumber.length() == 10) {
+            boolean isNumeric = true;
+            for (int i = 0; i < phoneNumber.length(); i++) {
+                if (!Character.isDigit(phoneNumber.charAt(i))) {
+                    isNumeric = false;
+                    break;
+                }
+            }
+            if (isNumeric) {
+                this.phoneNumber = phoneNumber;
+            } else {
+                System.out.println("Invalid phone number: must contain only digits.");
+            }
+        } else {
+            System.out.println("Invalid phone number: must be 10 digits long.");
+        }
+    }
+}
+
+class Guest extends User {
+    private int age;
+    public boolean familyStatus;
+
+    public Guest() {}
+
+    public Guest(String name, String phoneNo, String password, int age, boolean familyStatus) {
+        super(name, phoneNo, password);
+        this.age = age;
+        this.familyStatus = familyStatus;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void addBooking() {
+        if (guest == null) {
+                System.out.println("No guest found. Please add a guest first.");
+                return;
+            }
+
+            System.out.println("Choose room type:\n1- Family Apartment\n2- Single Apartment");
+            int roomChoice = input.nextInt();
+            double price;
+
+            if (roomChoice == 1) {
+                System.out.print("Enter number of people: ");
+                int peopleNo = input.nextInt();
+                FamilyApartment familyApartment = new FamilyApartment(peopleNo);
+                price = familyApartment.calculatePrice(peopleNo);
+                System.out.println("Price for Family Apartment: " + price);
+            } else {
+                System.out.print("Include buffet? (true/false): ");
+                boolean buffetIncluded = input.nextBoolean();
+                System.out.print("Include view? (true/false): ");
+                boolean roomWithView = input.nextBoolean();
+                SingleApartment singleApartment = new SingleApartment(buffetIncluded, roomWithView);
+                price = singleApartment.calculatePrice(buffetIncluded, roomWithView);
+                System.out.println("Price for Single Apartment: " + price);
+            }
+
+            Booking booking = new Booking(guest, price);
+            admin.addBooking(booking);
+            System.out.println("Booking added successfully with price: " + price);
+        }
+    
+        public void viewBooking(String bookingID) {
+        }
+    }
+
+
+class Admin extends User {
+    private String userName;
+    private String email;
+    public Booking[] bookings;
+    public Guest[] guests;
+    public int bookingCount=0;
+    public int guestCount=0;
+
+    public Admin() {
+        bookings = new Booking[100];
+        guests = new Guest[100];
+        bookingCount ++;
+        guestCount ++;
+    }
+
+    public Admin(String userName, String email, String name, String phoneNumber, String password) {
+        super(name, phoneNumber, password);
+        this.userName = userName;
+        setEmail(email); 
+        bookings = new Booking[100];
+        guests = new Guest[100];
+        bookingCount ++;
+        guestCount ++;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName){
+        this.userName = userName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        if (email.contains("@")) {
+            this.email = email;
+        } else {
+            System.out.println("Invalid email: must contain '@'.");
+        }
+    }
+
+    public void showStatistics() {
+        System.out.println("Total Bookings: " + bookingCount);
+        System.out.println("Total Guests: " + guestCount);
+    }
+
+    public void viewBookings() {
+        System.out.println("List of all bookings:");
+        for (int i = 0; i < bookingCount; i++) {
+            System.out.println("Booking ID: " + bookings[i].getBookingID());
+        }
+    }
+
+    public void delBooking(String bookingID) {
+        for (int i = 0; i < bookingCount; i++) {
+            if (bookings[i].getBookingID().equals(bookingID)) {
+                bookings[i] = bookings[bookingCount - 1];
+                bookings[bookingCount - 1] = null;
+                bookingCount--;
+                System.out.println("Booking with ID " + bookingID + " has been deleted.");
+                return;
+            }
+        }
+        System.out.println("Booking with ID " + bookingID + " not found.");
+    }
+
+    public void displayGuestInfo(Guest guest) {
+        System.out.println("Guest Information:");
+        System.out.println("Name: " + guest.name);
+        System.out.println("Age: " + guest.getAge());
+        System.out.println("Family Status: " + (guest.isFamilyStatus() ? "Yes" : "No"));
+        System.out.println("Phone Number: " + guest.getPhoneNo());
+    }
+
+    public void addBooking(Booking booking) {//زايد اذا ماتبيه احذفي 
+        if (bookingCount < bookings.length) {
+            bookings[bookingCount] = booking;
+            bookingCount++;
+            System.out.println("Booking added successfully.");
+        } else {
+            System.out.println("Booking limit reached.");
+        }
+    }
+
+    public void addGuest(Guest guest) {
+        if (guestCount < guests.length) {
+            guests[guestCount] = guest;
+            guestCount++;
+            System.out.println("Guest added successfully.");
+        } else {
+            System.out.println("Guest limit reached.");
+        }
+    }
+}
+
+class Booking {
+    private int amountOfDays;
+    private int roomNo;
+    private String bookingID;
+    private Guest guest;
+    public int month;
+    public int day;
+    public static final int MAX_BOOKING_NUMBER = 100;
+    public static int numberOfBookings = 0;
+
+    public Booking() {
+        if (numberOfBookings < MAX_BOOKING_NUMBER) {
+            numberOfBookings++;
+        } else {
+            System.out.println("Maximum booking limit reached.");
+        }
+    }
+
+    public Booking(int amountOfDays, int roomNo, String phoneNo, Guest guest, int month, int day) {
+        this();
+        this.amountOfDays = amountOfDays;
+        this.roomNo = roomNo;
+        this.guest = guest;
+        this.month = month;
+        this.day = day;
+        setBookingID(phoneNo); 
+    }
+
+    public void assignRoomNo(int peopleNo) {
+        this.roomNo = (peopleNo <= 2) ? new Random().nextInt(50) + 1 : new Random().nextInt(50) + 51;
+        System.out.println("Assigned Room Number: " + this.roomNo);
+    }
+
+    public int getAmountOfDays() {
+        return amountOfDays;
+    }
+
+    public void setAmountOfDays(int days) {
+        this.amountOfDays = days;
+    }
+
+    public String getBookingID() {
+        return bookingID;
+    }
+
+    public void setBookingID(String phoneNo) {
+        String randomDigits = String.valueOf(new Random().nextInt(9000) + 1000);
+        this.bookingID = phoneNo.substring(0, 3) + randomDigits;
+    }
+
+    public int getRoomNo() {
+        return roomNo;
+    }
+
+    public Guest getGuest() {
+        return guest;
+    }
+
+    public void setGuest(Guest guest) {
+        this.guest = guest;
+    }
+
+    public void printBookingDetails() {
+        System.out.println("Booking Details:");
+        System.out.println("Booking ID: " + bookingID);
+        System.out.println("Room Number: " + roomNo);
+        System.out.println("Guest Name: " + guest.name);
+        System.out.println("Amount of Days: " + amountOfDays);
+        System.out.println("Booking Date: " + month + "/" + day);
+    }
+}
+
+class FamilyApartment extends Booking{
+     private int peopleNo;
+     public static int countFamilyBookings = 0;
+
+     // Default constructor
+     public FamilyApartment() {
+         countFamilyBookings++;
+     }
+
+     // Parameterized constructor
+     public FamilyApartment(int days, Guest guest, int peopleNo) {
+         this.peopleNo = peopleNo;
+         countFamilyBookings++;
+         // Additional initialization code if needed
+     }
+
+     // Getter for peopleNo
+     public int getPeopleNo() {
+         return peopleNo;
+     }
+
+     // Setter for peopleNo
+     public void setPeopleNo(int peopleNo) {
+         this.peopleNo = peopleNo;
+     }
+
+     // Method to calculate price for family bookings
+     public double calculatePrice(int peopleNo) {
+         // Implement pricing logic based on the number of people
+         return 0.0;
+     }
+
+     // Method to return the number of beds
+     public int bedsNo() {
+         // Implement bed count logic
+         return 0;
+     }
+ }
+
+class SingleApartment extends Booking{
+        private boolean buffetIncluded;
+        private boolean roomWithView;
+        public static int countSingleBookings = 0;
+
+        // Default constructor
+        public SingleApartment() {
+            countSingleBookings++;
+        }
+
+        // Parameterized constructor
+        public SingleApartment(int days, Guest guest, boolean buffetIncluded, boolean roomWithView) {
+            this.buffetIncluded = buffetIncluded;
+            this.roomWithView = roomWithView;
+            countSingleBookings++;
+            // Additional initialization code if needed
+        }
+
+        // Method to calculate price for single bookings
+        public double calculatePrice(boolean buffet, boolean viewIncluded) {
+            // Implement pricing logic based on buffet and view options
+            return 0.0;
+        }
+
+        // Method to show included options
+        public double showIncludedOptions(String bookingID, boolean buffet, boolean viewIncluded) {
+            // Implement logic to display and add options to the price
+            return 0.0;
+        }
+    }
+
+class Payment {
+    private double amount;
+    private String dateOfPayment;
+
+    // Default constructor
+    public Payment() {}
+    // Constructor with parameters
+    public Payment(double amount, String dateOfPayment){
+        this.amount = amount;
+        this.dateOfPayment = dateOfPayment;
+    }
+    // Getter for amount
+    public double getAmount() {
+        return amount;
+    }
+   
+    // Method to calculate and return the amount
+    public double calcAmount(double amount) {
+        this.amount = amount;
+        return this.amount;
+    }
+
+    // Getter for dateOfPayment
+    public String getDate() {
+        return dateOfPayment;
+    }
+
+    // Setter for dateOfPayment
+    public void setDate(int month, int day) {
+        this.dateOfPayment = month + "/" + day;
+    }
+}
+
+class CreditCard extends Payment {
+    private String cardNo;
+    private String cardPassword;
+
+    // Parameterized constructor
+    public CreditCard(double amount,String dateOfPayment, String cardNo, String cardPassword) {
+        calcAmount(amount,dateOfPayment);
+        this.cardNo = cardNo;
+        this.cardPassword = cardPassword;
+    }
+
+    // Getter and setter for cardNo
+    public String getCardNo() {
+        return cardNo;
+    }
+
+    public void setCardNo(String cardNo) {
+        this.cardNo = cardNo;
+    }
+
+    // Getter and setter for cardPassword
+    public String getCardPassword() {
+        return cardPassword;
+    }
+
+    public void setCardPassword(String cardPassword) {
+        this.cardPassword = cardPassword;
+    }
+
+    // Method to display a message (e.g., payment confirmation)
+    public void message() {
+        System.out.println("Payment processed using Credit Card ending in " + cardNo.substring(cardNo.length() - 4));
+    }
+}
+
+class Cash extends Payment {
+    private String paymentDueDate;
+
+    // Parameterized constructor
+    public Cash(double amount) {
+        calcAmount(amount);
+    }
+
+    // Setter for paymentDueDate
+    public void setDueDate(int day, int month) {
+        this.paymentDueDate = month + "/" + day;
+    }
+
+    // Getter for paymentDueDate
+    public String getDueDate() {
+        return paymentDueDate;
+    }
+
+    // Method to display a message related to the cash payment
+    public void message() {
+        System.out.println("Cash payment is due on " + paymentDueDate);
+    }
+}
